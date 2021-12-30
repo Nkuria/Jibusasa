@@ -7,21 +7,21 @@ import Fastify from 'fastify';
  *************************************************/
 // DATABASE TABLES
 const Hotels = [
-  {id: 1, name: "Kempiski hotel", location: "Westlands"},
-  {id: 2, name: "Hilton hotel", location: "CBD"},
-  {id: 3, name: "Serena hotel", location: "Thika"},
+  { id: 1, name: "Kempiski hotel", location: "Westlands" },
+  { id: 2, name: "Hilton hotel", location: "CBD" },
+  { id: 3, name: "Serena hotel", location: "Thika" },
 ];
 
 const MenuItems = [
-  {id: 1, name: "Sukuma wiki", price: 50},
-  {id: 2, name: "Nyama Choma", price: 170},
-  {id: 3, name: "Soda", price: 25},
+  { id: 1, name: "Sukuma wiki", price: 50 },
+  { id: 2, name: "Nyama Choma", price: 170 },
+  { id: 3, name: "Soda", price: 25 },
 ]
 
 const Orders = [
-  {id: 1, hotel_id: 1, items: [1, 2]},
-  {id: 2, hotel_id: 3, items: [3, 2]},
-  {id: 3, hotel_id: 1, items: [3, 3, 1]},
+  { id: 1, hotel_id: 1, items: [1, 2] },
+  { id: 2, hotel_id: 3, items: [3, 2] },
+  { id: 3, hotel_id: 1, items: [3, 3, 1] },
 ];
 
 
@@ -30,7 +30,7 @@ const Orders = [
  *************************************************/
 
 // SERVER SETUP
-const app = Fastify({logger: true});
+const app = Fastify({ logger: true });
 app.register(require('fastify-formbody'));
 
 /*********************
@@ -58,7 +58,7 @@ app.post('/create-hotel', function (req, res) {
     res.send(hotel)
   } catch (error) {
     console.log(error)
-    res.code(400).send({error: 'Invalid request'});
+    res.code(400).send({ error: 'Invalid request' });
   }
 });
 
@@ -68,7 +68,7 @@ app.get('/hotels', function (req, res) {
     res.send(Hotels)
   } catch (error) {
     console.log(error)
-    res.code(400).send({error: 'Invalid request'});
+    res.code(400).send({ error: 'Invalid request' });
   }
 });
 
@@ -79,7 +79,7 @@ app.get('/get-hotel-by-id/:id', function (req, res) {
     res.send(hotel)
   } catch (error) {
     console.log(error)
-    res.code(400).send({error: 'Invalid request'});
+    res.code(400).send({ error: 'Invalid request' });
   }
 });
 
@@ -96,7 +96,7 @@ app.post('/menu-item-new', function (req, res) {
     res.send(menuItem)
   } catch (error) {
     console.log(error)
-    res.code(400).send({error: 'Invalid request'});
+    res.code(400).send({ error: 'Invalid request' });
   }
 });
 
@@ -106,7 +106,7 @@ app.get('/list-menu-items', function (req, res) {
     res.send(MenuItems)
   } catch (error) {
     console.log(error)
-    res.code(400).send({error: 'Invalid request'});
+    res.code(400).send({ error: 'Invalid request' });
   }
 });
 
@@ -117,12 +117,12 @@ app.get('/menu-items/:id', function (req, res) {
     res.send(menuItem)
   } catch (error) {
     console.log(error)
-    res.code(400).send({error: 'Invalid request'});
+    res.code(400).send({ error: 'Invalid request' });
   }
 });
 
 // Create an Order item
-app.post('/order-item-new', function(req, res){
+app.post('/order-item-new', function (req, res) {
   try {
     const newOrderItem = {
       id: Math.max(...Orders.map(order => order.id)) + 1,
@@ -131,37 +131,37 @@ app.post('/order-item-new', function(req, res){
     };
     Orders.push(newOrderItem)
     res.send(newOrderItem)
-  }catch(err) {
+  } catch (err) {
     console.log(err)
-    res.code(400).send({error: 'Invalid Request'})
+    res.code(400).send({ error: 'Invalid Request' })
   }
 })
 
 // Get all Orders
-app.get('/orders', function(req, res){
-  try{
-  let fullOrder = []
-  Orders.map((order) => {
-    let orderObject = {}
-    orderObject['id'] = order.id
-    orderObject['hotel'] = Hotels.find((hotel) => hotel.id === order.hotel_id)
-    let items = []
-    order.items.map((item) => {
-      items.push(MenuItems.find((menuItem) => menuItem.id === item ))
+app.get('/orders', function (req, res) {
+  try {
+    let fullOrder = []
+    Orders.map((order) => {
+      let orderObject = {}
+      orderObject['id'] = order.id
+      orderObject['hotel'] = Hotels.find((hotel) => hotel.id === order.hotel_id)
+      let items = []
+      order.items.map((item) => {
+        items.push(MenuItems.find((menuItem) => menuItem.id === item))
+      })
+      orderObject['items'] = items
+      fullOrder.push(orderObject)
     })
-    orderObject['items'] = items
-    fullOrder.push(orderObject)
-  })
     res.send(fullOrder)
-  }catch (error) {
+  } catch (error) {
     console.log(error)
-    res.code(400).send({error: "Invalid Request"})
+    res.code(400).send({ error: "Invalid Request" })
   }
 })
 
 // Get an order item by Id
 
-app.get('/order/:id', function(req, res) {
+app.get('/order/:id', function (req, res) {
   try {
     let order = Orders.find(order => order.id == req.params['id'])
     let finalOrder = {}
@@ -169,14 +169,14 @@ app.get('/order/:id', function(req, res) {
     finalOrder['hotel'] = Hotels.find((hotel) => hotel.id == order.hotel_id)
     let items = []
     order.items.map((item) => {
-     items.push(MenuItems.find((menuItem) => menuItem.id == item))
+      items.push(MenuItems.find((menuItem) => menuItem.id == item))
     })
     finalOrder['items'] = items
     res.send(finalOrder)
 
-  }catch(error) {
+  } catch (error) {
     console.log(error)
-    res.code(400).send({error: "Invalid request"})
+    res.code(400).send({ error: "Invalid request" })
   }
 })
 

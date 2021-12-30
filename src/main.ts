@@ -137,10 +137,10 @@ app.post('/order-item-new', function(req, res){
   }
 })
 
-
+// Get all Orders
 app.get('/orders', function(req, res){
+  try{
   let fullOrder = []
-  
   Orders.map((order) => {
     let orderObject = {}
     orderObject['id'] = order.id
@@ -152,11 +152,31 @@ app.get('/orders', function(req, res){
     orderObject['items'] = items
     fullOrder.push(orderObject)
   })
-  try{
     res.send(fullOrder)
   }catch (error) {
     console.log(error)
     res.code(400).send({error: "Invalid Request"})
+  }
+})
+
+// Get an order item by Id
+
+app.get('/order/:id', function(req, res) {
+  try {
+    let order = Orders.find(order => order.id == req.params['id'])
+    let finalOrder = {}
+    finalOrder['id'] = order.id
+    finalOrder['hotel'] = Hotels.find((hotel) => hotel.id == order.hotel_id)
+    let items = []
+    order.items.map((item) => {
+     items.push(MenuItems.find((menuItem) => menuItem.id == item))
+    })
+    finalOrder['items'] = items
+    res.send(finalOrder)
+
+  }catch(error) {
+    console.log(error)
+    res.code(400).send({error: "Invalid request"})
   }
 })
 

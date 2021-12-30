@@ -121,6 +121,44 @@ app.get('/menu-items/:id', function (req, res) {
   }
 });
 
+// Create an Order item
+app.post('/order-item-new', function(req, res){
+  try {
+    const newOrderItem = {
+      id: Math.max(...Orders.map(order => order.id)) + 1,
+      hotel_id: req.body['hotel_id'],
+      items: req.body['items']
+    };
+    Orders.push(newOrderItem)
+    res.send(newOrderItem)
+  }catch(err) {
+    console.log(err)
+    res.code(400).send({error: 'Invalid Request'})
+  }
+})
+
+
+app.get('/orders', function(req, res){
+  let fullOrder = []
+  
+  Orders.map((order) => {
+    let orderObject = {}
+    orderObject['id'] = order.id
+    orderObject['hotel'] = Hotels.find((hotel) => hotel.id === order.hotel_id)
+    let items = []
+    order.items.map((item) => {
+      items.push(MenuItems.find((menuItem) => menuItem.id === item ))
+    })
+    orderObject['items'] = items
+    fullOrder.push(orderObject)
+  })
+  try{
+    res.send(fullOrder)
+  }catch (error) {
+    console.log(error)
+    res.code(400).send({error: "Invalid Request"})
+  }
+})
 
 // START SERVER
 app.listen(3000, '0.0.0.0', function (err, address) {
